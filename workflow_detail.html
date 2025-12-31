@@ -1,0 +1,26 @@
+<h1>Workflow: {{ instance.workflow.name }}</h1>
+<p>Current Step: {{ instance.current_step.name if instance.current_step else "None" }}</p>
+
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
+
+<h2>Allowed Transitions:</h2>
+<form method="POST">
+    {% csrf_token %}
+    <select name="to_step">
+        {% for transition in allowed_transitions %}
+            <option value="{{ transition.to_step.id }}">{{ transition.to_step.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Perform Transition</button>
+</form>
+
+<h3>Actions:</h3>
+<ul>
+    {% for action in instance.actions.all %}
+        <li>{{ action.performed_by.username }}: {{ action.from_step.name if action.from_step else "N/A" }} → {{ action.to_step.name if action.to_step else "N/A" }} at {{ action.performed_at }}</li>
+    {% empty %}
+        <li>No actions yet.</li>
+    {% endfor %}
+</ul>
